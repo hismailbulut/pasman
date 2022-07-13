@@ -26,6 +26,8 @@ func (cmd *CommandProcessor) Process(args []string) (error, bool) {
 		} else {
 			return nil, true
 		}
+	case "info":
+		fmt.Println("Last save time:", cmd.pmap.saved.LastSaveTime.Format("02-01-2006 15:04:05"))
 	case "save":
 		err := cmd.pmap.Save()
 		if err != nil {
@@ -34,7 +36,11 @@ func (cmd *CommandProcessor) Process(args []string) (error, bool) {
 			fmt.Println("Saved successfully")
 		}
 	case "reset":
-		err := cmd.Reset(args[1:])
+		if len(args) < 2 {
+			fmt.Println("This command requires an argument (type help)")
+			break
+		}
+		err := cmd.Reset(args[1])
 		if err != nil {
 			fmt.Println("Error:", err)
 		}
@@ -54,12 +60,29 @@ func (cmd *CommandProcessor) Process(args []string) (error, bool) {
 			fmt.Println("Error:", err)
 		}
 	case "edit":
-		err := cmd.Edit(args[1:])
+		if len(args) < 2 {
+			fmt.Println("This command requires an argument (type help)")
+			break
+		}
+		err := cmd.Edit(args[1])
 		if err != nil {
 			fmt.Println("Error:", err)
 		}
 	case "delete":
-		err := cmd.Delete(args[1:])
+		if len(args) < 2 {
+			fmt.Println("This command requires an argument (type help)")
+			break
+		}
+		err := cmd.Delete(args[1])
+		if err != nil {
+			fmt.Println("Error:", err)
+		}
+	case "sort":
+		if len(args) < 2 {
+			fmt.Println("This command requires an argument (type help)")
+			break
+		}
+		err := cmd.Sort(args[1])
 		if err != nil {
 			fmt.Println("Error:", err)
 		}
@@ -69,11 +92,8 @@ func (cmd *CommandProcessor) Process(args []string) (error, bool) {
 	return nil, false
 }
 
-func (cmd *CommandProcessor) Reset(args []string) error {
-	if len(args) == 0 {
-		return fmt.Errorf("This command takes additional argument(s) (type help)")
-	}
-	switch args[0] {
+func (cmd *CommandProcessor) Reset(arg string) error {
+	switch arg {
 	case "password":
 		fmt.Println("Specify a new master password")
 		pass1 := ReadPassword("Password: ")
@@ -84,7 +104,7 @@ func (cmd *CommandProcessor) Reset(args []string) error {
 			fmt.Println("Passwords are not same")
 		}
 	default:
-		return fmt.Errorf("Unknown argument %s", args[0])
+		return fmt.Errorf("Unknown argument %s", arg)
 	}
 	return nil
 }
@@ -124,7 +144,7 @@ func (cmd *CommandProcessor) List(args []string) error {
 		return fmt.Errorf("This command takes additional argument(s) (type help)")
 	}
 	switch args[0] {
-	case "pattern":
+	case "search":
 		// Merge all args after pattern
 		pattern := mergeArgs(args[1:])
 		indices := cmd.pmap.Search(pattern)
@@ -141,11 +161,11 @@ func (cmd *CommandProcessor) List(args []string) error {
 			fmt.Println("Nothing found")
 		}
 	case "accounts":
-		PrintPairs(sortUniqueMap(cmd.pmap.UniqueNames()), "Account Name", "Repeat")
+		PrintPairs(sortUniqueMap(cmd.pmap.UniqueAccounts()), "Account Name", "Repeat")
 	case "emails":
 		PrintPairs(sortUniqueMap(cmd.pmap.UniqueMails()), "Email", "Repeat")
 	case "usernames":
-		PrintPairs(sortUniqueMap(cmd.pmap.UniqueUsers()), "Username", "Repeat")
+		PrintPairs(sortUniqueMap(cmd.pmap.UniqueUsernames()), "Username", "Repeat")
 	case "passwords":
 		PrintPairs(sortUniqueMap(cmd.pmap.UniquePasswords()), "Password", "Repeat")
 	default:
@@ -161,15 +181,6 @@ func isWhitespace(s string) bool {
 		}
 	}
 	return true
-}
-
-func hasWhitespace(s string) bool {
-	for _, c := range []rune(s) {
-		if unicode.IsSpace(c) {
-			return true
-		}
-	}
-	return false
 }
 
 func (cmd *CommandProcessor) Add() error {
@@ -194,11 +205,8 @@ func (cmd *CommandProcessor) Add() error {
 	return nil
 }
 
-func (cmd *CommandProcessor) Edit(args []string) error {
-	if len(args) != 1 {
-		return fmt.Errorf("This command takes only one argument (type help)")
-	}
-	index, err := strconv.ParseInt(args[0], 10, 64)
+func (cmd *CommandProcessor) Edit(arg string) error {
+	index, err := strconv.ParseInt(arg, 10, 64)
 	if err != nil {
 		return fmt.Errorf("Index has to be a valid number!")
 	}
@@ -240,11 +248,8 @@ func (cmd *CommandProcessor) Edit(args []string) error {
 	return nil
 }
 
-func (cmd *CommandProcessor) Delete(args []string) error {
-	if len(args) != 1 {
-		return fmt.Errorf("This command takes only one argument (type help)")
-	}
-	index, err := strconv.ParseInt(args[0], 10, 64)
+func (cmd *CommandProcessor) Delete(arg string) error {
+	index, err := strconv.ParseInt(arg, 10, 64)
 	if err != nil {
 		return fmt.Errorf("Index has to be valid number!")
 	}
@@ -252,6 +257,24 @@ func (cmd *CommandProcessor) Delete(args []string) error {
 		cmd.pmap.Delete(int(index))
 	} else {
 		return fmt.Errorf("Index out of range")
+	}
+	return nil
+}
+
+func (cmd *CommandProcessor) Sort(arg string) error {
+	switch arg {
+	case "accounts":
+		cmd.pmap.SortByAccounts()
+	case "emails":
+		cmd.pmap.SortByMails()
+	case "usernames":
+		cmd.pmap.SortByUsernames()
+	case "passwords":
+		cmd.pmap.SortByPasswords()
+	case "time":
+		cmd.pmap.SortByTime()
+	default:
+		return fmt.Errorf("Unknown argument %s", arg)
 	}
 	return nil
 }

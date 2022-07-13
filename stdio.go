@@ -36,8 +36,9 @@ func Fatalf(format string, args ...any) {
 
 func PrintEntries(pmap *PasswordMap, indices []int) {
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetRowLine(false)
-	table.SetHeader([]string{"Index", "Name", "Mail", "Username", "Password", "Note", "Last Edit (DD-MM-YYYY)"})
+	table.SetCaption(true, fmt.Sprintf("total %d", len(indices)))
+	table.SetAlignment(tablewriter.ALIGN_LEFT)
+	table.SetHeader([]string{"Index", "Account Name", "E-Mail", "Username", "Password", "Note", "Last Edit (DD-MM-YYYY)"})
 	for _, index := range indices {
 		entry := pmap.Get(index)
 		table.Append([]string{
@@ -55,7 +56,8 @@ func PrintEntries(pmap *PasswordMap, indices []int) {
 
 func PrintPairs(arr []stringIntPair, first, second string) {
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetBorder(false)
+	table.SetCaption(true, fmt.Sprintf("total %d", len(arr)))
+	table.SetAlignment(tablewriter.ALIGN_LEFT)
 	table.SetHeader([]string{first, second})
 	for i := range arr {
 		table.Append([]string{

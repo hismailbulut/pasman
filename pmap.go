@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"os"
+	"sort"
 	"strings"
 	"time"
 )
@@ -71,9 +72,9 @@ func (pmap *PasswordMap) Set(index int, entry Entry) {
 func (pmap *PasswordMap) Search(pattern string) []int {
 	indices := []int{}
 	for i, entry := range pmap.saved.Entries {
-		if strings.Contains(entry.Name, pattern) ||
-			strings.Contains(entry.Mail, pattern) ||
-			strings.Contains(entry.User, pattern) {
+		if strings.Contains(strings.ToLower(entry.Name), strings.ToLower(pattern)) ||
+			strings.Contains(strings.ToLower(entry.Mail), strings.ToLower(pattern)) ||
+			strings.Contains(strings.ToLower(entry.User), strings.ToLower(pattern)) {
 			indices = append(indices, i)
 		}
 	}
@@ -88,7 +89,7 @@ func (pmap *PasswordMap) All() []int {
 	return indices
 }
 
-func (pmap *PasswordMap) UniqueNames() map[string]int {
+func (pmap *PasswordMap) UniqueAccounts() map[string]int {
 	m := map[string]int{}
 	for _, entry := range pmap.saved.Entries {
 		i, ok := m[entry.Name]
@@ -114,7 +115,7 @@ func (pmap *PasswordMap) UniqueMails() map[string]int {
 	return m
 }
 
-func (pmap *PasswordMap) UniqueUsers() map[string]int {
+func (pmap *PasswordMap) UniqueUsernames() map[string]int {
 	m := map[string]int{}
 	for _, entry := range pmap.saved.Entries {
 		i, ok := m[entry.User]
@@ -140,7 +141,43 @@ func (pmap *PasswordMap) UniquePasswords() map[string]int {
 	return m
 }
 
+func (pmap *PasswordMap) SortByAccounts() {
+	sort.Slice(pmap.saved.Entries, func(i, j int) bool {
+		return pmap.saved.Entries[i].Name < pmap.saved.Entries[j].Name
+	})
+	pmap.edited = true
+}
+
+func (pmap *PasswordMap) SortByMails() {
+	sort.Slice(pmap.saved.Entries, func(i, j int) bool {
+		return pmap.saved.Entries[i].Mail < pmap.saved.Entries[j].Mail
+	})
+	pmap.edited = true
+}
+
+func (pmap *PasswordMap) SortByUsernames() {
+	sort.Slice(pmap.saved.Entries, func(i, j int) bool {
+		return pmap.saved.Entries[i].User < pmap.saved.Entries[j].User
+	})
+	pmap.edited = true
+}
+
+func (pmap *PasswordMap) SortByPasswords() {
+	sort.Slice(pmap.saved.Entries, func(i, j int) bool {
+		return pmap.saved.Entries[i].Pass < pmap.saved.Entries[j].Pass
+	})
+	pmap.edited = true
+}
+
+func (pmap *PasswordMap) SortByTime() {
+	sort.Slice(pmap.saved.Entries, func(i, j int) bool {
+		return pmap.saved.Entries[i].Time.Unix() > pmap.saved.Entries[j].Time.Unix()
+	})
+	pmap.edited = true
+}
+
 func (pmap *PasswordMap) Save() error {
+	pmap.saved.LastSaveTime = time.Now()
 	jsonData, err := json.Marshal(pmap.saved)
 	if err != nil {
 		return err

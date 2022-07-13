@@ -1,21 +1,30 @@
 
-q, quit, exit                -> Quit from pasman
+q, quit, exit        -> Quit from pasman
 
-save                         -> Saves changes to file
+info                 -> Show file info
 
-reset                        -> Resets some information, use it with its commands:
-    password                 -> Resets master password
+save                 -> Save changes to file
 
-list                         -> Lists some information, use it with its commands:
-    pattern [search pattern] -> Searchs for pattern and lists every entry contains it
-    all                      -> Lists all entries
-    accounts                 -> Lists all unique account names
-    emails                   -> Lists all unique emails
-    usernames                -> Lists all unique usernames
-    usernames                -> Lists all unique passwords
+reset [arg]          -> Reset something
+    password         -> Reset master password
 
-add                          -> Add an entry
+list [arg]           -> List some information
+    all (ls)         -> List all entries
+    search [pattern] -> Search for pattern and list every entry contains it
+    accounts         -> List all unique account names
+    emails           -> List all unique emails
+    usernames        -> List all unique usernames
+    passwords        -> List all unique passwords
 
-edit [index]                 -> Edit entry at the index
+add                  -> Add an entry
 
-delete [index]               -> Deletes the entry at given index (list all to see indexes)
+edit [index]         -> Edit entry at the index
+
+delete [index]       -> Delete the entry at given index (list all to see indexes)
+
+sort [arg]           -> Sort entire list
+    accounts         -> Sort by account names (A-Z)
+    emails           -> Sort by emails (A-Z)
+    usernames        -> Sort by usernames (A-Z)
+    passwords        -> Sort by passwords (A-Z)
+    time             -> Sort by edit time (newest to oldest)
