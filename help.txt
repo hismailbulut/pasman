@@ -1,0 +1,21 @@
+
+q, quit, exit                -> Quit from pasman
+
+save                         -> Saves changes to file
+
+reset                        -> Resets some information, use it with its commands:
+    password                 -> Resets master password
+
+list                         -> Lists some information, use it with its commands:
+    pattern [search pattern] -> Searchs for pattern and lists every entry contains it
+    all                      -> Lists all entries
+    accounts                 -> Lists all unique account names
+    emails                   -> Lists all unique emails
+    usernames                -> Lists all unique usernames
+    usernames                -> Lists all unique passwords
+
+add                          -> Add an entry
+
+edit [index]                 -> Edit entry at the index
+
+delete [index]               -> Deletes the entry at given index (list all to see indexes)
