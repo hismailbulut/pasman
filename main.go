@@ -13,6 +13,7 @@ var HelpMessage string
 
 func main() {
 	file := flag.String("file", "pasman.bin", "The file name contains encrypted passwords and other information")
+	flag.Parse()
 	var pmap *PasswordMap
 	_, err := os.Stat(*file)
 	if os.IsNotExist(err) {
