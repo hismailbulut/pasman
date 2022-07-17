@@ -58,6 +58,8 @@ func (cmd *CommandProcessor) Process(args []string) (error, bool) {
 		err := cmd.Add()
 		if err != nil {
 			fmt.Println("Error:", err)
+		} else {
+			fmt.Println("Added successfully")
 		}
 	case "edit":
 		if len(args) < 2 {
@@ -76,6 +78,8 @@ func (cmd *CommandProcessor) Process(args []string) (error, bool) {
 		err := cmd.Delete(args[1])
 		if err != nil {
 			fmt.Println("Error:", err)
+		} else {
+			fmt.Println("Deleted successfully")
 		}
 	case "sort":
 		if len(args) < 2 {
@@ -85,6 +89,30 @@ func (cmd *CommandProcessor) Process(args []string) (error, bool) {
 		err := cmd.Sort(args[1])
 		if err != nil {
 			fmt.Println("Error:", err)
+		} else {
+			fmt.Println("Sorted successfully")
+		}
+	case "import":
+		if len(args) < 2 {
+			fmt.Println("This command requires an argument (type help)")
+			break
+		}
+		err := cmd.pmap.Import(args[1])
+		if err != nil {
+			fmt.Println("Error:", err)
+		} else {
+			fmt.Println("Imported successfully")
+		}
+	case "export":
+		if len(args) < 2 {
+			fmt.Println("This command requires an argument (type help)")
+			break
+		}
+		err := cmd.pmap.Export(args[1])
+		if err != nil {
+			fmt.Println("Error:", err)
+		} else {
+			fmt.Println("Exported successfully")
 		}
 	default:
 		fmt.Printf("Unknown command %s\n", args[0])
@@ -212,27 +240,33 @@ func (cmd *CommandProcessor) Edit(arg string) error {
 	}
 	if index >= 0 && index < int64(cmd.pmap.Length()) {
 		entry := cmd.pmap.Get(int(index))
+		fmt.Println("Leave empty to not change")
 		edited := false
+		fmt.Println("Current account name is", entry.Name)
 		name := ReadLine("Name: ")
 		if !isWhitespace(name) {
 			entry.Name = name
 			edited = true
 		}
+		fmt.Println("Current email is", entry.Mail)
 		mail := ReadLine("Email: ")
 		if !isWhitespace(mail) {
 			entry.Mail = mail
 			edited = true
 		}
+		fmt.Println("Current username is", entry.User)
 		user := ReadLine("Username: ")
 		if !isWhitespace(user) {
 			entry.User = user
 			edited = true
 		}
+		fmt.Println("Current password is", entry.Pass)
 		pass := ReadLine("Password: ")
 		if !isWhitespace(pass) {
 			entry.Pass = pass
 			edited = true
 		}
+		fmt.Println("Current note is", entry.Note)
 		note := ReadLine("Note: ")
 		if !isWhitespace(note) {
 			entry.Note = note

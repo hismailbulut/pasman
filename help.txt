@@ -28,3 +28,7 @@ sort [arg]           -> Sort entire list
     usernames        -> Sort by usernames (A-Z)
     passwords        -> Sort by passwords (A-Z)
     time             -> Sort by edit time (newest to oldest)
+
+import [file]        -> Import entries from a json file (overwrites existing entries) (unsafe)
+
+export [file]        -> Export entries to a json file (unsafe)

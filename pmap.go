@@ -143,37 +143,64 @@ func (pmap *PasswordMap) UniquePasswords() map[string]int {
 
 func (pmap *PasswordMap) SortByAccounts() {
 	sort.Slice(pmap.saved.Entries, func(i, j int) bool {
-		return pmap.saved.Entries[i].Name < pmap.saved.Entries[j].Name
+		return strings.ToLower(pmap.saved.Entries[i].Name) < strings.ToLower(pmap.saved.Entries[j].Name)
 	})
 	pmap.edited = true
 }
 
 func (pmap *PasswordMap) SortByMails() {
 	sort.Slice(pmap.saved.Entries, func(i, j int) bool {
-		return pmap.saved.Entries[i].Mail < pmap.saved.Entries[j].Mail
+		return strings.ToLower(pmap.saved.Entries[i].Mail) < strings.ToLower(pmap.saved.Entries[j].Mail)
 	})
 	pmap.edited = true
 }
 
 func (pmap *PasswordMap) SortByUsernames() {
 	sort.Slice(pmap.saved.Entries, func(i, j int) bool {
-		return pmap.saved.Entries[i].User < pmap.saved.Entries[j].User
+		return strings.ToLower(pmap.saved.Entries[i].User) < strings.ToLower(pmap.saved.Entries[j].User)
 	})
 	pmap.edited = true
 }
 
 func (pmap *PasswordMap) SortByPasswords() {
 	sort.Slice(pmap.saved.Entries, func(i, j int) bool {
-		return pmap.saved.Entries[i].Pass < pmap.saved.Entries[j].Pass
+		return strings.ToLower(pmap.saved.Entries[i].Pass) < strings.ToLower(pmap.saved.Entries[j].Pass)
 	})
 	pmap.edited = true
 }
 
 func (pmap *PasswordMap) SortByTime() {
 	sort.Slice(pmap.saved.Entries, func(i, j int) bool {
-		return pmap.saved.Entries[i].Time.Unix() > pmap.saved.Entries[j].Time.Unix()
+		return pmap.saved.Entries[i].Time.UnixMilli() > pmap.saved.Entries[j].Time.UnixMilli()
 	})
 	pmap.edited = true
+}
+
+// Unsafe function
+func (pmap *PasswordMap) Export(filename string) error {
+	jsonData, err := json.Marshal(pmap.saved)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(filename, jsonData, 0666)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// Unsafe function
+func (pmap *PasswordMap) Import(filename string) error {
+	jsonData, err := os.ReadFile(filename)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(jsonData, &pmap.saved)
+	if err != nil {
+		return err
+	}
+	pmap.edited = true
+	return nil
 }
 
 func (pmap *PasswordMap) Save() error {
